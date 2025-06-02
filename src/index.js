@@ -3,6 +3,9 @@ const cors = require('cors');
 const { port } = require('./config/env');
 const errorHandler = require('./middleware/errorHandler');
 
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -12,6 +15,28 @@ const badgeRoutes = require('./routes/badgeRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
+
+// Swagger setup
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'BarterKita Backend API',
+      version: '1.0.0',
+      description: 'API documentation for BarterKita backend service',
+    },
+    servers: [
+      {
+        url: `http://localhost:${port}`,
+      },
+    ],
+  },
+  apis: ['./src/routes/*.js', './src/controllers/*.js'], // files containing annotations
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Middleware
 app.use(cors());
